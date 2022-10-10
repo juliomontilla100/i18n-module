@@ -1,6 +1,6 @@
 import isHTTPS from 'is-https'
 import { hasProtocol } from '~i18n-ufo'
-import { localeMessages, options } from './options'
+import { Constants, localeMessages, options } from './options'
 import { formatMessage } from './utils-common'
 
 /** @typedef {import('../../types/internal').ResolvedOptions} ResolvedOptions */
@@ -212,6 +212,21 @@ export function mergeAdditionalMessages (i18n, additionalMessages, localeCodes, 
       i18n.mergeLocaleMessage(locale, additionalEntry[locale])
       i18n.mergeLocaleMessage(locale, existingMessages)
     }
+  }
+}
+
+/**
+ * @param {string} locale
+ */
+ export function getHelpers (locale = '') {
+  const isDefaultLocale = locale === options.defaultLocale
+  const isPrefixAndDefault = options.strategy === Constants.STRATEGIES.PREFIX_AND_DEFAULT
+  const isPrefixExceptDefault = options.strategy === Constants.STRATEGIES.PREFIX_EXCEPT_DEFAULT
+
+  return {
+    isDefaultLocale,
+    isPrefixAndDefault,
+    isPrefixExceptDefault
   }
 }
 

@@ -5,7 +5,7 @@ import { klona } from '~i18n-klona'
 import { nuxtI18nHead } from './head-meta'
 import { Constants, nuxtOptions, options } from './options'
 import { createLocaleFromRouteGetter, getLocaleCookie, getLocaleDomain, getLocalesRegex, matchBrowserLocale, parseAcceptLanguage, setLocaleCookie } from './utils-common'
-import { loadLanguageAsync, resolveBaseUrl, registerStore, mergeAdditionalMessages } from './plugin.utils'
+import { loadLanguageAsync, resolveBaseUrl, registerStore, mergeAdditionalMessages, getHelpers } from './plugin.utils'
 
 Vue.use(VueI18n)
 
@@ -139,6 +139,8 @@ export default async (context) => {
     let redirectPath = ''
 
     const isStaticGenerate = process.static && process.server
+    const isDifferentLocale = getLocaleFromRoute(route) !== newLocale
+    const { isPrefixAndDefault, isDefaultLocale } = getHelpers(newLocale)
     // Decide whether we should redirect to a different route.
     if (
       !isStaticGenerate &&
@@ -146,7 +148,7 @@ export default async (context) => {
       options.strategy !== Constants.STRATEGIES.NO_PREFIX &&
       // Skip if already on the new locale unless the strategy is "prefix_and_default" and this is the default
       // locale, in which case we might still redirect as we prefer unprefixed route in this case.
-      (getLocaleFromRoute(route) !== newLocale || (options.strategy === Constants.STRATEGIES.PREFIX_AND_DEFAULT && newLocale === options.defaultLocale))
+      (isDifferentLocale || (isPrefixAndDefault && isDefaultLocale && options.prefixAndDefaultRules.routing === 'default'))
     ) {
       // The current route could be 404 in which case attempt to find matching route using the full path since
       // "switchLocalePath" can only find routes if the current route exists.
